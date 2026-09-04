@@ -3,74 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google 小恐龍遊戲 (簡易版)</title>
+    <title>Google 小恐龍 (擬真版)</title>
     <style>
         body {
             margin: 0;
-            padding: 0;
             background-color: #f7f7f7;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
-            font-family: Arial, sans-serif;
+            font-family: 'Courier New', Courier, monospace;
         }
-
         h2 {
             color: #535353;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
-
-        /* 遊戲主畫面容器 */
-        .game-container {
-            width: 800px;
-            height: 250px;
-            background-color: #ffffff;
-            border-bottom: 2px solid #535353;
-            position: relative;
-            overflow: hidden;
+        canvas {
+            background-color: #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-
-        /* 小恐龍 */
-        #dino {
-            width: 44px;
-            height: 47px;
-            position: absolute;
-            bottom: 0;
-            left: 50px;
-            background: #535353; /* 這裡用純色方塊代替圖片，您也可以換成圖片 */
-        }
-
-        /* 跳躍動畫樣式 */
-        .jump {
-            animation: dinoJump 0.4s linear;
-        }
-
-        @keyframes dinoJump {
-            0% { bottom: 0; }
-            50% { bottom: 120px; }
-            100% { bottom: 0; }
-        }
-
-        /* 障礙物 (仙人掌) */
-        #obstacle {
-            width: 20px;
-            height: 40px;
-            background-color: #d9534f;
-            position: absolute;
-            bottom: 0;
-            left: 800px;
-            animation: moveObstacle 1.5s infinite linear;
-        }
-
-        @keyframes moveObstacle {
-            0% { left: 800px; }
-            100% { left: -40px; }
-        }
-
-        .instructions {
-            margin-top: 15px;
+        .info {
+            margin-top: 10px;
             color: #777;
             font-size: 14px;
         }
@@ -78,57 +32,200 @@
 </head>
 <body>
 
-    <h2>🦕 Chrome 小恐龍遊戲</h2>
-    
-    <div class="game-container" id="gameContainer">
-        <div id="dino"></div>
-        <div id="obstacle"></div>
-    </div>
+    <h2>🦕 Chrome 小恐龍 (擬真 Canvas 版)</h2>
+    <canvas id="gameCanvas" width="800" height="250"></canvas>
+    <div class="info">按下 <b>空白鍵 (Space)</b> 或 <b>↑ 鍵</b> 跳躍，向下鍵降落</div>
 
-    <div class="instructions">
-        操作方式：按下 <b>空白鍵 (Space)</b> 讓小恐龍跳躍！
-    </div>
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
 
-    <script>
-        const dino = document.getElementById("dino");
-        const obstacle = document.getElementById("obstacle");
+// 遊戲變數
+let score = 0;
+let highScore = 0;
+let gameSpeed = 5;
+let isGameOver = false;
 
-        // 監聽鍵盤事件：按下空白鍵跳躍
-        document.addEventListener("keydown", function (event) {
-            if (event.code === "Space") {
-                jump();
-            }
-        });
-
-        // 點擊畫面也可以跳躍
-        document.addEventListener("click", function () {
-            jump();
-        });
-
-        function jump() {
-            if (!dino.classList.contains("jump")) {
-                dino.classList.add("jump");
-                setTimeout(function () {
-                    dino.classList.remove("jump");
-                }, 400); // 400毫秒後移除跳躍狀態
+// 小恐龍物件 (用精緻的像素畫或向量繪製代替方塊)
+let dino = {
+    x: 50,
+    y: 170,
+    width: 40,
+    height: 43,
+    vy: 0,
+    gravity: 0.8,
+    jumpPower: -12,
+    isJumping: false,
+    draw() {
+        // 畫身體
+        ctx.fillStyle = "#535353";
+        ctx.fillRect(this.x + 10, this.y + 10, 25, 25);
+        // 頭部
+        ctx.fillRect(this.x + 25, this.y, 15, 15);
+        // 眼睛
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(this.x + 33, this.y + 3, 3, 3);
+        // 腳 (簡單動態感)
+        ctx.fillStyle = "#535353";
+        if (this.isJumping) {
+            ctx.fillRect(this.x + 12, this.y + 35, 6, 8);
+            ctx.fillRect(this.x + 22, this.y + 35, 6, 8);
+        } else {
+            let frame = Math.floor(Date.now() / 100) % 2;
+            if (frame === 0) {
+                ctx.fillRect(this.x + 12, this.y + 35, 5, 8);
+                ctx.fillRect(this.x + 24, this.y + 35, 5, 6);
+            } else {
+                ctx.fillRect(this.x + 12, this.y + 35, 5, 6);
+                ctx.fillRect(this.x + 24, this.y + 35, 5, 8);
             }
         }
+    }
+};
 
-        // 每隔 10 毫秒檢查一次碰撞
-        let isAlive = setInterval(function () {
-            // 取得小恐龍目前的底部距離 (bottom)
-            let dinoBottom = parseInt(window.getComputedStyle(dino).getPropertyValue("bottom"));
-            
-            // 取得仙人掌目前的左側距離 (left)
-            let obstacleLeft = parseInt(window.getComputedStyle(obstacle).getPropertyValue("left"));
+// 障礙物陣列
+let obstacles = [];
 
-            // 碰撞判定：當仙人掌跑到恐龍位置附近 (left 介於 50 到 90 之間)，且恐龍高度小於 40
-            if (obstacleLeft > 50 && obstacleLeft < 90 && dinoBottom < 40) {
-                alert("遊戲結束！撞到仙人掌囉～");
-                window.location.reload(); // 重新整理網頁重新開始
-            }
-        }, 10);
-    </script>
+class Obstacle {
+    constructor() {
+        this.width = 20 + Math.random() * 15;
+        this.height = 30 + Math.random() * 20;
+        this.x = canvas.width;
+        this.y = 213 - this.height;
+    }
+    draw() {
+        ctx.fillStyle = "#535353";
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+        // 加一點仙人掌的細節
+        ctx.clearRect(this.x + 4, this.y + 5, 3, 6);
+        ctx.clearRect(this.x + this.width - 7, this.y + 12, 3, 6);
+    }
+    update() {
+        this.x -= gameSpeed;
+    }
+}
+
+// 鍵盤監聽
+document.addEventListener("keydown", function(e) {
+    if (e.code === "Space" || e.code === "ArrowUp") {
+        if (dino.y >= 170 && !isGameOver) {
+            dino.vy = dino.jumpPower;
+            dino.isJumping = true;
+        }
+        if (isGameOver) {
+            resetGame();
+        }
+    }
+    if (e.code === "ArrowDown" && dino.isJumping) {
+        dino.vy += 6; // 快速下墜
+    }
+});
+
+// 點擊畫面也能跳
+canvas.addEventListener("click", function() {
+    if (dino.y >= 170 && !isGameOver) {
+        dino.vy = dino.jumpPower;
+        dino.isJumping = true;
+    }
+    if (isGameOver) {
+        resetGame();
+    }
+});
+
+function resetGame() {
+    score = 0;
+    gameSpeed = 5;
+    obstacles = [];
+    isGameOver = false;
+    loop();
+}
+
+// 產生障礙物計時器
+let obstacleTimer = 0;
+
+function loop() {
+    if (isGameOver) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 1. 畫地板線條
+    ctx.strokeStyle = "#535353";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, 213);
+    ctx.lineTo(canvas.width, 213);
+    ctx.stroke();
+
+    // 2. 更新與繪製小恐龍
+    dino.vy += dino.gravity;
+    dino.y += dino.vy;
+    if (dino.y > 170) {
+        dino.y = 170;
+        dino.vy = 0;
+        dino.isJumping = false;
+    }
+    dino.draw();
+
+    // 3. 管理障礙物
+    obstacleTimer++;
+    if (obstacleTimer > Math.random() * 50 + 70) {
+        obstacles.push(new Obstacle());
+        obstacleTimer = 0;
+    }
+
+    for (let i = obstacles.length - 1; i >= 0; i--) {
+        obstacles[i].update();
+        obstacles[i].draw();
+
+        // 碰撞偵測 (AABB 碰撞箱)
+        if (
+            dino.x < obstacles[i].x + obstacles[i].width - 5 &&
+            dino.x + dino.width - 5 > obstacles[i].x &&
+            dino.y < obstacles[i].y + obstacles[i].height &&
+            dino.y + dino.height > obstacles[i].y
+        ) {
+            isGameOver = true;
+        }
+
+        // 移除跑出畫面的障礙物
+        if (obstacles[i].x + obstacles[i].width < 0) {
+            obstacles.splice(i, 1);
+            score += 10;
+            if (score > highScore) highScore = score;
+            // 隨著分數增加逐漸加速
+            gameSpeed = 5 + Math.floor(score / 100);
+        }
+    }
+
+    // 4. 顯示分數
+    ctx.fillStyle = "#535353";
+    ctx.font = "16px Courier New";
+    let scoreStr = String(score).padStart(5, '0');
+    let highStr = String(highScore).padStart(5, '0');
+    ctx.fillText(`HI ${highStr}  ${scoreStr}`, canvas.width - 180, 30);
+
+    // 遊戲結束畫面
+    if (isGameOver) {
+        ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = "#fff";
+        ctx.font = "24px Courier New";
+        ctx.textAlign = "center";
+        ctx.fillText("G A M E   O V E R", canvas.width / 2, canvas.height / 2 - 10);
+        
+        ctx.font = "14px Courier New";
+        ctx.fillText("按一下空白鍵或點擊畫面重新開始", canvas.width / 2, canvas.height / 2 + 25);
+        ctx.textAlign = "left"; // 復原
+        return;
+    }
+
+    requestAnimationFrame(loop);
+}
+
+// 啟動遊戲
+loop();
+</script>
 
 </body>
 </html>
