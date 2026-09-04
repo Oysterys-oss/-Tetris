@@ -22,13 +22,13 @@
         .handheld-shell {
             background-color: #c0b8b0;
             border: 4px solid #8c8275;
-            border-radius: 12px 12px 40px 12px;
-            padding: 25px 20px 30px 20px;
+            border-radius: 12px 12px 45px 12px;
+            padding: 22px 22px 28px 22px;
             box-shadow: 0 12px 30px rgba(0,0,0,0.6), inset 0 2px 6px rgba(255,255,255,0.7);
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 310px;
+            width: 335px;
             position: relative;
         }
 
@@ -47,12 +47,13 @@
         .screen-frame {
             background-color: #8b956d;
             border: 5px solid #33382b;
-            border-radius: 4px 4px 20px 4px;
+            border-radius: 4px 4px 22px 4px;
             padding: 8px;
             box-shadow: inset 0 4px 8px rgba(0,0,0,0.5);
             position: relative;
         }
 
+        /* 放大螢幕畫布尺寸 */
         canvas#tetris {
             display: block;
             background: #9cad78;
@@ -63,7 +64,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 180px;
+            width: 200px;
             background: rgba(156, 173, 120, 0.95);
             color: #111;
             font-family: 'Courier New', Courier, monospace;
@@ -73,7 +74,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100px;
+            height: 110px;
             border: 2px dashed #2c3220;
         }
 
@@ -97,7 +98,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin: 18px 0 22px 0;
+            margin: 14px 0 16px 0;
             padding: 0 5px;
         }
 
@@ -122,7 +123,7 @@
             font-family: sans-serif;
             font-style: italic;
             font-weight: 900;
-            font-size: 15px;
+            font-size: 16px;
             color: #1a155c;
             letter-spacing: -0.5px;
         }
@@ -133,19 +134,20 @@
             vertical-align: super;
         }
 
-        /* 操作區 (十字鍵與斜向 A/B 鈕) */
+        /* 操作區 */
         .controls-area {
             display: flex;
             justify-content: space-between;
             width: 100%;
             align-items: flex-end;
             padding: 0 5px;
+            position: relative;
         }
 
         .d-pad {
             position: relative;
-            width: 96px;
-            height: 96px;
+            width: 100px;
+            height: 100px;
         }
 
         .pad-btn {
@@ -168,34 +170,38 @@
             transform: translateY(2px);
         }
 
-        #btnUp { top: 0; left: 32px; width: 32px; height: 32px; border-radius: 3px 3px 0 0; }
-        #btnDown { bottom: 0; left: 32px; width: 32px; height: 32px; border-radius: 0 0 3px 3px; }
-        #btnLeft { top: 32px; left: 0; width: 32px; height: 32px; border-radius: 3px 0 0 3px; }
-        #btnRight { top: 32px; right: 0; width: 32px; height: 32px; border-radius: 0 3px 3px 0; }
+        #btnUp { top: 0; left: 34px; width: 32px; height: 32px; border-radius: 3px 3px 0 0; }
+        #btnDown { bottom: 0; left: 34px; width: 32px; height: 32px; border-radius: 0 0 3px 3px; }
+        #btnLeft { top: 34px; left: 0; width: 32px; height: 32px; border-radius: 3px 0 0 3px; }
+        #btnRight { top: 34px; right: 0; width: 32px; height: 32px; border-radius: 0 3px 3px 0; }
         
         .pad-center {
             position: absolute;
-            top: 32px;
-            left: 32px;
+            top: 34px;
+            left: 34px;
             width: 32px;
             height: 32px;
             background-color: #2b2b2b;
         }
 
-        /* 右側 A/B 鈕與下方 Select/Start 區 */
+        /* 右側操作區容器 */
         .action-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
+            position: relative;
+            width: 155px;
+            height: 110px;
         }
 
         /* 經典斜向 A/B 鈕 */
         .ab-buttons {
+            position: absolute;
+            top: 0;
+            right: 5px;
             display: flex;
             gap: 12px;
-            transform: rotate(-25deg); /*還原經典斜向角度*/
-            margin-right: 5px;
+            transform: rotate(-25deg);
         }
 
         .action-btn-group {
@@ -206,13 +212,13 @@
         }
 
         .action-btn {
-            width: 42px;
-            height: 42px;
-            background-color: #6b2d5c; /* Game Boy 紫紅經典色 */
+            width: 44px;
+            height: 44px;
+            background-color: #6b2d5c;
             color: white;
             border: none;
             border-radius: 50%;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: bold;
             box-shadow: 0 4px 0 #3d1533;
             cursor: pointer;
@@ -232,16 +238,17 @@
             font-size: 9px;
             color: #1a155c;
             font-weight: bold;
-            transform: rotate(25deg); /* 把字轉正 */
+            transform: rotate(25deg);
         }
 
-        /* 下方長條狀 SELECT (暫停) 與 START 鈕 */
+        /* 修正紅框處 SELECT / START 鍵的置中與對齊 */
         .system-buttons {
+            position: absolute;
+            bottom: 5px;
+            left: 20px;
             display: flex;
-            gap: 12px;
+            gap: 15px;
             transform: rotate(-25deg);
-            margin-right: 15px;
-            margin-top: -5px;
         }
 
         .sys-btn-group {
@@ -252,7 +259,7 @@
         }
 
         .sys-btn {
-            width: 36px;
+            width: 38px;
             height: 14px;
             background-color: #666;
             border: none;
@@ -279,7 +286,8 @@
 
     <div class="handheld-shell">
         <div class="screen-frame">
-            <canvas id="tetris" width="210" height="280"></canvas>
+            <!-- 放大後的畫布尺寸 (寬 230, 高 300) -->
+            <canvas id="tetris" width="230" height="300"></canvas>
             
             <div id="gameOverOverlay" class="overlay-screen">
                 <h3>GAME OVER</h3>
@@ -338,7 +346,7 @@
     <script>
         const canvas = document.getElementById('tetris');
         const context = canvas.getContext('2d');
-        const blockSize = 14; 
+        const blockSize = 15; // 稍微調大方塊尺寸讓畫面更飽滿
         context.scale(blockSize, blockSize);
 
         let isGameOver = false;
@@ -384,47 +392,47 @@
 
         function drawUI() {
             context.fillStyle = '#3e4431';
-            context.fillRect(10, 0, 0.2, 20);
+            context.fillRect(10.3, 0, 0.2, 20);
 
             context.font = '0.7px "Courier New"';
             context.fillStyle = '#222';
-            context.fillText('SCORE', 11.2, 1.5);
+            context.fillText('SCORE', 11.5, 1.5);
             
             context.fillStyle = '#7a8a5e';
-            context.fillRect(11, 2, 3.5, 2);
+            context.fillRect(11.2, 2, 3.8, 2);
             context.strokeStyle = '#3e4431';
             context.lineWidth = 0.1;
-            context.strokeRect(11, 2, 3.5, 2);
+            context.strokeRect(11.2, 2, 3.8, 2);
 
             context.fillStyle = '#111';
             context.font = 'bold 0.9px "Courier New"';
-            context.fillText(player.score, 11.5, 3.3);
+            context.fillText(player.score, 11.7, 3.3);
 
             context.font = '0.7px "Courier New"';
             context.fillStyle = '#222';
-            context.fillText('NEXT', 11.8, 5.5);
+            context.fillText('NEXT', 12.0, 5.5);
 
             context.fillStyle = '#7a8a5e';
-            context.fillRect(11, 6, 3.5, 4);
-            context.strokeRect(11, 6, 3.5, 4);
+            context.fillRect(11.2, 6, 3.8, 4);
+            context.strokeRect(11.2, 6, 3.8, 4);
 
             if (player.nextMatrix) {
-                const offsetX = 11 + (3.5 - player.nextMatrix[0].length) / 2;
+                const offsetX = 11.2 + (3.8 - player.nextMatrix[0].length) / 2;
                 const offsetY = 6 + (4 - player.nextMatrix.length) / 2;
                 drawMatrix(player.nextMatrix, {x: offsetX, y: offsetY});
             }
 
             context.font = '0.7px "Courier New"';
             context.fillStyle = '#222';
-            context.fillText('LEVEL', 11.5, 11.5);
+            context.fillText('LEVEL', 11.7, 11.5);
 
             context.fillStyle = '#7a8a5e';
-            context.fillRect(11, 12, 3.5, 2);
-            context.strokeRect(11, 12, 3.5, 2);
+            context.fillRect(11.2, 12, 3.8, 2);
+            context.strokeRect(11.2, 12, 3.8, 2);
 
             context.fillStyle = '#111';
             context.font = 'bold 0.9px "Courier New"';
-            context.fillText(Math.floor(player.score / 50) + 1, 12.5, 13.3);
+            context.fillText(Math.floor(player.score / 50) + 1, 12.7, 13.3);
         }
 
         function draw() {
