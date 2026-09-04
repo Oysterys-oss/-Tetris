@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>復古掌機版俄羅斯方塊 (含 GAME OVER 顯示)</title>
+    <title>復古掌機版俄羅斯方塊 (含暫停功能)</title>
     <style>
         body {
             background-color: #2b2b2b;
@@ -55,14 +55,14 @@
             border: 2px solid #3e4431;
         }
 
-        /* GAME OVER 覆蓋提示樣式 */
-        .game-over-overlay {
+        /* 提示覆蓋層（通用於 GAME OVER 與 PAUSE） */
+        .overlay-screen {
             position: absolute;
             top: 50%;
             left: 6px;
             transform: translateY(-50%);
             width: 140px;
-            background: rgba(156, 173, 120, 0.92);
+            background: rgba(156, 173, 120, 0.95);
             color: #111;
             font-family: 'Courier New', Courier, monospace;
             font-weight: bold;
@@ -75,17 +75,18 @@
             border: 2px dashed #2c3220;
         }
 
-        .game-over-overlay h3 {
+        .overlay-screen h3 {
             margin: 0 0 5px 0;
-            font-size: 16px;
+            font-size: 15px;
             letter-spacing: 1px;
             color: #a63a3a;
         }
 
-        .game-over-overlay p {
+        .overlay-screen p {
             margin: 0;
             font-size: 9px;
             color: #333;
+            line-height: 1.4;
         }
 
         .lcd-panel {
@@ -169,17 +170,17 @@
         .action-buttons {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 8px;
         }
 
         .action-btn {
-            width: 60px;
-            height: 60px;
+            width: 52px;
+            height: 52px;
             background-color: #a63a3a;
             color: white;
             border: none;
             border-radius: 50%;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
             box-shadow: 0 4px 0 #6e2525;
             cursor: pointer;
@@ -202,6 +203,15 @@
         .action-btn.blue:active {
             box-shadow: 0 1px 0 #23426e;
         }
+
+        .action-btn.yellow {
+            background-color: #b38f27;
+            box-shadow: 0 4px 0 #735a17;
+            font-size: 9px;
+        }
+        .action-btn.yellow:active {
+            box-shadow: 0 1px 0 #735a17;
+        }
     </style>
 </head>
 <body>
@@ -212,10 +222,16 @@
         <div class="screen-frame">
             <canvas id="tetris" width="140" height="280"></canvas>
             
-            <!-- GAME OVER 畫面提示 -->
-            <div id="gameOverOverlay" class="game-over-overlay">
+            <!-- GAME OVER 畫面 -->
+            <div id="gameOverOverlay" class="overlay-screen">
                 <h3>GAME OVER</h3>
                 <p>按下任意鍵<br>重新開始</p>
+            </div>
+
+            <!-- PAUSE 暫停畫面 -->
+            <div id="pauseOverlay" class="overlay-screen">
+                <h3 style="color: #3a69a6;">PAUSED</h3>
+                <p>遊戲暫停中<br>點擊暫停鍵繼續</p>
             </div>
 
             <div class="lcd-panel">
@@ -246,6 +262,7 @@
             </div>
 
             <div class="action-buttons">
+                <button class="action-btn yellow" id="btnPause">暫 停</button>
                 <button class="action-btn blue" id="btnRotate">轉 旋</button>
                 <button class="action-btn" id="btnDrop">落 下</button>
             </div>
@@ -263,6 +280,7 @@
         nextContext.scale(14, 14);
 
         let isGameOver = false;
+        let isPaused = false;
 
         function updateScore() {
             document.getElementById('score').innerText = player.score;
@@ -364,7 +382,7 @@
         }
 
         function playerDrop() {
-            if (isGameOver) return;
+            if (isGameOver || isPaused) return;
             player.pos.y++;
             if (collide(arena, player)) {
                 player.pos.y--;
@@ -377,7 +395,7 @@
         }
 
         function playerDropInstant() {
-            if (isGameOver) return;
+            if (isGameOver || isPaused) return;
             while (!collide(arena, player)) {
                 player.pos.y++;
             }
@@ -390,7 +408,7 @@
         }
 
         function playerMove(dir) {
-            if (isGameOver) return;
+            if (isGameOver || isPaused) return;
             player.pos.x += dir;
             if (collide(arena, player)) {
                 player.pos.x -= dir;
@@ -407,11 +425,20 @@
             document.getElementById('gameOverOverlay').style.display = 'flex';
         }
 
+        function togglePause() {
+            if (isGameOver) return;
+            isPaused = !isPaused;
+            const pauseOverlay = document.getElementById('pauseOverlay');
+            pauseOverlay.style.display = isPaused ? 'flex' : 'none';
+        }
+
         function restartGame() {
             arena.forEach(row => row.fill(0));
             player.score = 0;
             isGameOver = false;
+            isPaused = false;
             document.getElementById('gameOverOverlay').style.display = 'none';
+            document.getElementById('pauseOverlay').style.display = 'none';
             player.nextMatrix = null;
             playerReset();
             updateScore();
@@ -434,7 +461,7 @@
         }
 
         function playerRotate(dir) {
-            if (isGameOver) return;
+            if (isGameOver || isPaused) return;
             const posX = player.pos.x;
             let offset = 1;
             rotate(player.matrix, dir);
@@ -470,12 +497,15 @@
             const deltaTime = time - lastTime;
             lastTime = time;
 
-            if (!isGameOver) {
+            if (!isGameOver && !isPaused) {
                 dropCounter += deltaTime;
                 if (dropCounter > dropInterval) {
                     playerDrop();
                 }
                 draw();
+            } else if (isPaused) {
+                // 暫停時短暫更新時間基準避免恢復時突然大掉落
+                lastTime = time;
             }
 
             requestAnimationFrame(update);
@@ -490,12 +520,18 @@
             score: 0,
         };
 
-        // 鍵盤操控與重新開始
+        // 鍵盤操控
         document.addEventListener('keydown', event => {
+            if (event.key === 'p' || event.key === 'P') {
+                togglePause();
+                return;
+            }
             if (isGameOver) {
                 restartGame();
                 return;
             }
+            if (isPaused) return;
+
             if (event.key === 'ArrowLeft') playerMove(-1);
             else if (event.key === 'ArrowRight') playerMove(1);
             else if (event.key === 'ArrowDown') playerDrop();
@@ -503,21 +539,18 @@
             else if (event.code === 'Space') playerDropInstant();
         });
 
-        // 觸控按鈕操控與重新開始
-        function handleAction(action) {
-            if (isGameOver) {
-                restartGame();
-                return;
-            }
-            action();
-        }
+        // 觸控按鈕事件
+        document.getElementById('btnPause').addEventListener('click', togglePause);
+        
+        document.getElementById('btnLeft').addEventListener('click', () => { if(!isGameOver && !isPaused) playerMove(-1); });
+        document.getElementById('btnRight').addEventListener('click', () => { if(!isGameOver && !isPaused) playerMove(1); });
+        document.getElementById('btnDown').addEventListener('click', () => { if(!isGameOver && !isPaused) playerDrop(); });
+        document.getElementById('btnUp').addEventListener('click', () => { if(!isGameOver && !isPaused) playerRotate(1); });
+        document.getElementById('btnRotate').addEventListener('click', () => { if(!isGameOver && !isPaused) playerRotate(1); });
+        document.getElementById('btnDrop').addEventListener('click', () => { if(!isGameOver && !isPaused) playerDropInstant(); });
 
-        document.getElementById('btnLeft').addEventListener('click', () => handleAction(() => playerMove(-1)));
-        document.getElementById('btnRight').addEventListener('click', () => handleAction(() => playerMove(1)));
-        document.getElementById('btnDown').addEventListener('click', () => handleAction(() => playerDrop()));
-        document.getElementById('btnUp').addEventListener('click', () => handleAction(() => playerRotate(1)));
-        document.getElementById('btnRotate').addEventListener('click', () => handleAction(() => playerRotate(1)));
-        document.getElementById('btnDrop').addEventListener('click', () => handleAction(() => playerDropInstant()));
+        // GAME OVER 畫面點擊任意處可重啟
+        document.getElementById('gameOverOverlay').addEventListener('click', restartGame);
 
         playerReset();
         updateScore();
