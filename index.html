@@ -18,7 +18,7 @@
             touch-action: manipulation;
         }
 
-        /* 經典 Game Boy 機身外殼 (放大寬度至 390px) */
+        /* 經典 Game Boy 機身外殼 (維持寬度 390px) */
         .handheld-shell {
             background-color: #e0ded8;
             border: 4px solid #b5b2a8;
@@ -44,7 +44,7 @@
             box-shadow: 0 2px 0 #b0aeaa;
         }
 
-        /* 螢幕大型黑色鏡面外框 (跟著機身同步放大) */
+        /* 螢幕大型黑色鏡面外框 */
         .lens-frame {
             background-color: #2b2d2f;
             border-radius: 6px 6px 40px 6px;
@@ -248,11 +248,11 @@
             background-color: #2b2b2b;
         }
 
-        /* 中間區域：Select / Start 鍵（往右移至正中央完美位置） */
+        /* 中間區域：Select / Start 鍵（大幅向右移至正中央） */
         .middle-controls {
             position: absolute;
             bottom: 12px;
-            left: 124px;
+            left: 142px; /* 數值加大，讓按鈕明顯往右移 */
             display: flex;
             gap: 16px;
             transform: rotate(-25deg);
@@ -408,7 +408,7 @@
                 <button class="pad-btn" id="btnDown">▼</button>
             </div>
 
-            <!-- 完美置中的 Select / Start 鍵 -->
+            <!-- 調整後的正中央 Select / Start 鍵 -->
             <div class="middle-controls">
                 <div class="sys-btn-group">
                     <button class="sys-btn" id="btnPause"></button>
