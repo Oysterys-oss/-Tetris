@@ -18,17 +18,17 @@
             touch-action: manipulation;
         }
 
-        /* 經典 Game Boy 機身外殼 (放大寬度至 360px) */
+        /* 經典 Game Boy 機身外殼 (放大寬度至 390px) */
         .handheld-shell {
             background-color: #e0ded8;
             border: 4px solid #b5b2a8;
-            border-radius: 14px 14px 50px 14px;
-            padding: 22px 22px 28px 22px;
-            box-shadow: 0 14px 35px rgba(0,0,0,0.6), inset 0 2px 6px rgba(255,255,255,0.8);
+            border-radius: 16px 16px 55px 16px;
+            padding: 24px 24px 30px 24px;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.6), inset 0 2px 6px rgba(255,255,255,0.8);
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 360px;
+            width: 390px;
             position: relative;
         }
 
@@ -37,24 +37,24 @@
             content: '';
             position: absolute;
             top: 6px;
-            left: 22px;
-            right: 22px;
+            left: 24px;
+            right: 24px;
             height: 3px;
             background: #cfcdcb;
             box-shadow: 0 2px 0 #b0aeaa;
         }
 
-        /* 螢幕大型黑色鏡面外框 */
+        /* 螢幕大型黑色鏡面外框 (跟著機身同步放大) */
         .lens-frame {
             background-color: #2b2d2f;
-            border-radius: 6px 6px 35px 6px;
-            padding: 14px 14px 14px 14px;
+            border-radius: 6px 6px 40px 6px;
+            padding: 15px 15px 15px 15px;
             box-shadow: inset 0 3px 6px rgba(0,0,0,0.8);
             display: flex;
             flex-direction: column;
             align-items: center;
             position: relative;
-            width: 320px;
+            width: 346px;
         }
 
         /* 螢幕鏡面上方的紅藍裝飾線與文字 */
@@ -84,7 +84,7 @@
 
         .lens-header span {
             font-family: sans-serif;
-            font-size: 7.5px;
+            font-size: 8px;
             color: #8c9094;
             letter-spacing: 0.5px;
             font-weight: bold;
@@ -93,8 +93,8 @@
         /* 鏡面內部左上角的 BATTERY 指示燈 */
         .lens-battery {
             position: absolute;
-            top: 24px;
-            left: 20px;
+            top: 25px;
+            left: 22px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -116,7 +116,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* 綠色液晶螢幕本體 (微幅調寬) */
+        /* 綠色液晶螢幕本體 */
         .screen-lcd {
             background-color: #8b956d;
             border: 3px solid #1a1c1d;
@@ -135,7 +135,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 190px;
+            width: 200px;
             background: rgba(156, 173, 120, 0.95);
             color: #111;
             font-family: 'Courier New', Courier, monospace;
@@ -145,7 +145,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100px;
+            height: 105px;
             border: 2px dashed #2c3220;
         }
 
@@ -165,8 +165,8 @@
 
         /* 鏡面下方的 Nintendo GAME BOY 標誌 */
         .nintendo-logo-area {
-            width: 320px;
-            padding: 12px 0 8px 15px;
+            width: 346px;
+            padding: 14px 0 10px 15px;
             display: flex;
             align-items: baseline;
             gap: 6px;
@@ -176,7 +176,7 @@
             font-family: sans-serif;
             font-style: italic;
             font-weight: 900;
-            font-size: 16px;
+            font-size: 17px;
             color: #111c66;
             letter-spacing: -0.5px;
         }
@@ -185,13 +185,13 @@
             font-family: sans-serif;
             font-style: italic;
             font-weight: 900;
-            font-size: 17px;
+            font-size: 18px;
             color: #111c66;
             letter-spacing: -1px;
         }
 
         .tm-symbol {
-            font-size: 7.5px;
+            font-size: 8px;
             font-style: normal;
             font-weight: bold;
             color: #111c66;
@@ -204,15 +204,15 @@
             justify-content: space-between;
             width: 100%;
             align-items: flex-end;
-            padding: 5px 5px 0 5px;
+            padding: 5px 8px 0 8px;
             position: relative;
             margin-top: 5px;
         }
 
         .d-pad {
             position: relative;
-            width: 100px;
-            height: 100px;
+            width: 105px;
+            height: 105px;
         }
 
         .pad-btn {
@@ -220,7 +220,7 @@
             background-color: #2b2b2b;
             color: #444;
             border: none;
-            font-size: 10px;
+            font-size: 11px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -234,27 +234,27 @@
             transform: translateY(2px);
         }
 
-        #btnUp { top: 0; left: 34px; width: 32px; height: 32px; border-radius: 3px 3px 0 0; }
-        #btnDown { bottom: 0; left: 34px; width: 32px; height: 32px; border-radius: 0 0 3px 3px; }
-        #btnLeft { top: 34px; left: 0; width: 32px; height: 32px; border-radius: 3px 0 0 3px; }
-        #btnRight { top: 34px; right: 0; width: 32px; height: 32px; border-radius: 0 3px 3px 0; }
+        #btnUp { top: 0; left: 35px; width: 35px; height: 35px; border-radius: 3px 3px 0 0; }
+        #btnDown { bottom: 0; left: 35px; width: 35px; height: 35px; border-radius: 0 0 3px 3px; }
+        #btnLeft { top: 35px; left: 0; width: 35px; height: 35px; border-radius: 3px 0 0 3px; }
+        #btnRight { top: 35px; right: 0; width: 35px; height: 35px; border-radius: 0 3px 3px 0; }
         
         .pad-center {
             position: absolute;
-            top: 34px;
-            left: 34px;
-            width: 32px;
-            height: 32px;
+            top: 35px;
+            left: 35px;
+            width: 35px;
+            height: 35px;
             background-color: #2b2b2b;
         }
 
-        /* 中間區域：放置移到橘色框的 Select / Start 鍵 */
+        /* 中間區域：Select / Start 鍵（往右移至正中央完美位置） */
         .middle-controls {
             position: absolute;
-            bottom: 8px;
-            left: 104px;
+            bottom: 12px;
+            left: 124px;
             display: flex;
-            gap: 12px;
+            gap: 16px;
             transform: rotate(-25deg);
         }
 
@@ -266,8 +266,8 @@
         }
 
         .sys-btn {
-            width: 36px;
-            height: 13px;
+            width: 38px;
+            height: 14px;
             background-color: #8c8c8c;
             border: none;
             border-radius: 7px;
@@ -282,21 +282,21 @@
         }
 
         .sys-label {
-            font-size: 7px;
+            font-size: 7.5px;
             color: #1a1c66;
             font-weight: bold;
             letter-spacing: 0.5px;
             transform: rotate(25deg);
         }
 
-        /* 右側操作區容器 (僅放 A/B 鈕) */
+        /* 右側操作區容器 (A/B鈕) */
         .action-container {
             display: flex;
             flex-direction: column;
             align-items: flex-end;
             position: relative;
-            width: 110px;
-            height: 110px;
+            width: 120px;
+            height: 115px;
         }
 
         /* 經典斜向 A/B 鈕 */
@@ -305,7 +305,7 @@
             top: 0;
             right: 5px;
             display: flex;
-            gap: 12px;
+            gap: 14px;
             transform: rotate(-25deg);
         }
 
@@ -317,13 +317,13 @@
         }
 
         .action-btn {
-            width: 44px;
-            height: 44px;
+            width: 46px;
+            height: 46px;
             background-color: #8c1c5c;
             color: white;
             border: none;
             border-radius: 50%;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: bold;
             box-shadow: 0 4px 0 #4a0c2e;
             cursor: pointer;
@@ -339,7 +339,7 @@
         }
 
         .btn-label {
-            font-size: 9px;
+            font-size: 9.5px;
             color: #1a1c66;
             font-weight: bold;
             transform: rotate(25deg);
@@ -357,7 +357,7 @@
 
         .speaker-slot {
             width: 3px;
-            height: 24px;
+            height: 25px;
             background-color: #b0aeaa;
             border-radius: 2px;
             box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
@@ -379,7 +379,7 @@
             </div>
 
             <div class="screen-lcd">
-                <canvas id="tetris" width="232" height="280"></canvas>
+                <canvas id="tetris" width="246" height="294"></canvas>
                 
                 <div id="gameOverOverlay" class="overlay-screen">
                     <h3>GAME OVER</h3>
@@ -408,7 +408,7 @@
                 <button class="pad-btn" id="btnDown">▼</button>
             </div>
 
-            <!-- 移至橘色框位置的 Select / Start 鍵 -->
+            <!-- 完美置中的 Select / Start 鍵 -->
             <div class="middle-controls">
                 <div class="sys-btn-group">
                     <button class="sys-btn" id="btnPause"></button>
@@ -447,13 +447,13 @@
     <script>
         const canvas = document.getElementById('tetris');
         const context = canvas.getContext('2d');
-        const blockSize = 14.5; 
+        const blockSize = 15; 
         context.scale(blockSize, blockSize);
 
         let isGameOver = false;
         let isPaused = false;
 
-        const arena = createMatrix(15, 19);
+        const arena = createMatrix(15, 18);
 
         const player = {
             pos: {x: 0, y: 0},
@@ -493,7 +493,7 @@
 
         function drawUI() {
             context.fillStyle = '#3e4431';
-            context.fillRect(10, 0, 0.2, 19);
+            context.fillRect(10, 0, 0.2, 18);
 
             context.font = '0.7px "Courier New"';
             context.fillStyle = '#222';
@@ -540,7 +540,7 @@
             context.fillStyle = '#9cad78';
             context.fillRect(0, 0, canvas.width / blockSize, canvas.height / blockSize);
 
-            for (let y = 0; y < 19; y++) {
+            for (let y = 0; y < 18; y++) {
                 for (let x = 0; x < 10; x++) {
                     if (arena[y][x] !== 0) {
                         context.fillStyle = '#2c3220';
