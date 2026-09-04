@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google 小恐龍遊戲 (簡易版)</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+
+        h2 {
+            color: #535353;
+            margin-bottom: 10px;
+        }
+
+        /* 遊戲主畫面容器 */
+        .game-container {
+            width: 800px;
+            height: 250px;
+            background-color: #ffffff;
+            border-bottom: 2px solid #535353;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 小恐龍 */
+        #dino {
+            width: 44px;
+            height: 47px;
+            position: absolute;
+            bottom: 0;
+            left: 50px;
+            background: #535353; /* 這裡用純色方塊代替圖片，您也可以換成圖片 */
+        }
+
+        /* 跳躍動畫樣式 */
+        .jump {
+            animation: dinoJump 0.4s linear;
+        }
+
+        @keyframes dinoJump {
+            0% { bottom: 0; }
+            50% { bottom: 120px; }
+            100% { bottom: 0; }
+        }
+
+        /* 障礙物 (仙人掌) */
+        #obstacle {
+            width: 20px;
+            height: 40px;
+            background-color: #d9534f;
+            position: absolute;
+            bottom: 0;
+            left: 800px;
+            animation: moveObstacle 1.5s infinite linear;
+        }
+
+        @keyframes moveObstacle {
+            0% { left: 800px; }
+            100% { left: -40px; }
+        }
+
+        .instructions {
+            margin-top: 15px;
+            color: #777;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>🦕 Chrome 小恐龍遊戲</h2>
+    
+    <div class="game-container" id="gameContainer">
+        <div id="dino"></div>
+        <div id="obstacle"></div>
+    </div>
+
+    <div class="instructions">
+        操作方式：按下 <b>空白鍵 (Space)</b> 讓小恐龍跳躍！
+    </div>
+
+    <script>
+        const dino = document.getElementById("dino");
+        const obstacle = document.getElementById("obstacle");
+
+        // 監聽鍵盤事件：按下空白鍵跳躍
+        document.addEventListener("keydown", function (event) {
+            if (event.code === "Space") {
+                jump();
+            }
+        });
+
+        // 點擊畫面也可以跳躍
+        document.addEventListener("click", function () {
+            jump();
+        });
+
+        function jump() {
+            if (!dino.classList.contains("jump")) {
+                dino.classList.add("jump");
+                setTimeout(function () {
+                    dino.classList.remove("jump");
+                }, 400); // 400毫秒後移除跳躍狀態
+            }
+        }
+
+        // 每隔 10 毫秒檢查一次碰撞
+        let isAlive = setInterval(function () {
+            // 取得小恐龍目前的底部距離 (bottom)
+            let dinoBottom = parseInt(window.getComputedStyle(dino).getPropertyValue("bottom"));
+            
+            // 取得仙人掌目前的左側距離 (left)
+            let obstacleLeft = parseInt(window.getComputedStyle(obstacle).getPropertyValue("left"));
+
+            // 碰撞判定：當仙人掌跑到恐龍位置附近 (left 介於 50 到 90 之間)，且恐龍高度小於 40
+            if (obstacleLeft > 50 && obstacleLeft < 90 && dinoBottom < 40) {
+                alert("遊戲結束！撞到仙人掌囉～");
+                window.location.reload(); // 重新整理網頁重新開始
+            }
+        }, 10);
+    </script>
+
+</body>
+</html>
