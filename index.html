@@ -32,7 +32,7 @@
             position: relative;
         }
 
-        /* 機身頂部卡榫與電源開關條 */
+        /* 機身頂部裝飾線 */
         .handheld-shell::before {
             content: '';
             position: absolute;
@@ -163,7 +163,7 @@
             line-height: 1.4;
         }
 
-        /* 鏡面下方的 Nintendo GAME BOY 商標 */
+        /* 鏡面下方的 Nintendo GAME BOY 標誌 */
         .nintendo-logo-area {
             width: 290px;
             padding: 10px 0 6px 15px;
@@ -255,10 +255,10 @@
             align-items: flex-end;
             position: relative;
             width: 155px;
-            height: 110px;
+            height: 115px;
         }
 
-        /* 經典斜向 A/B 鈕 (改為經典桃紅色) */
+        /* 經典斜向 A/B 鈕 */
         .ab-buttons {
             position: absolute;
             top: 0;
@@ -278,7 +278,7 @@
         .action-btn {
             width: 42px;
             height: 42px;
-            background-color: #8c1c5c; /* 經典洋紅/桃紅色 */
+            background-color: #8c1c5c;
             color: white;
             border: none;
             border-radius: 50%;
@@ -304,13 +304,13 @@
             transform: rotate(25deg);
         }
 
-        /* 置中對齊的 Select / Start 按鈕區 */
+        /* 修正後的 Select / Start 按鈕區（與 A/B 鈕保持完美距離） */
         .system-buttons {
             position: absolute;
-            bottom: 25px;
-            left: 8px;
+            bottom: 32px;
+            left: 0px;
             display: flex;
-            gap: 16px;
+            gap: 14px;
             transform: rotate(-25deg);
         }
 
@@ -348,8 +348,8 @@
         /* 右下角 6 道經典喇叭孔 */
         .speaker-grille {
             position: absolute;
-            bottom: 5px;
-            right: 12px;
+            bottom: 4px;
+            right: 8px;
             display: flex;
             gap: 5px;
             transform: rotate(-25deg);
@@ -367,7 +367,6 @@
 <body>
 
     <div class="handheld-shell">
-        <!-- 黑色寬螢幕鏡面 -->
         <div class="lens-frame">
             <div class="lens-battery">
                 <div class="led-dot"></div>
@@ -394,14 +393,12 @@
             </div>
         </div>
 
-        <!-- 鏡面下方的 Nintendo GAME BOY 標誌 -->
         <div class="nintendo-logo-area">
             <span class="nintendo-brand">Nintendo</span>
             <span class="gameboy-brand">GAME BOY</span>
             <span class="tm-symbol">TM</span>
         </div>
 
-        <!-- 操作按鈕區 -->
         <div class="controls-area">
             <div class="d-pad">
                 <button class="pad-btn" id="btnUp">▲</button>
@@ -434,7 +431,6 @@
                     </div>
                 </div>
 
-                <!-- 喇叭孔 -->
                 <div class="speaker-grille">
                     <div class="speaker-slot"></div>
                     <div class="speaker-slot"></div>
