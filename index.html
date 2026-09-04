@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>復古掌機版俄羅斯方塊 (完美邊距)</title>
+    <title>復古掌機版俄羅斯方塊 (完美修正遊戲區)</title>
     <style>
         body {
             background-color: #2b2b2b;
@@ -27,7 +27,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 340px;
+            width: 350px;
         }
 
         .brand-title {
@@ -44,17 +44,18 @@
             border-radius: 6px;
             padding: 6px;
             display: flex;
+            gap: 8px;
             box-shadow: inset 0 3px 6px rgba(0,0,0,0.4);
         }
 
-        /* 確保畫布寬高以實際 pixels 為準，避免 CSS 縮放造成邊界卡住 */
-        canvas {
+        /* 獨立的遊戲畫布（僅對應左側遊戲區） */
+        canvas#tetris {
             display: block;
             background: #9cad78;
+            border: 2px solid #3e4431;
         }
 
         .lcd-panel {
-            margin-left: 8px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -176,7 +177,7 @@
         <div class="brand-title">★ TETRIS HANDHELD ★</div>
         
         <div class="screen-frame">
-            <!-- 設定主遊戲畫布大小為 140x280 (10欄 x 20行，每格 14 像素) -->
+            <!-- 遊戲主畫面畫布：寬 140, 高 280 (剛好對應 10欄 x 20行) -->
             <canvas id="tetris" width="140" height="280"></canvas>
             
             <div class="lcd-panel">
@@ -216,7 +217,7 @@
     <script>
         const canvas = document.getElementById('tetris');
         const context = canvas.getContext('2d');
-        const blockSize = 14; // 每一格放大到 14 像素，10x20 剛好 140x280
+        const blockSize = 14; 
         context.scale(blockSize, blockSize);
 
         const nextCanvas = document.getElementById('nextCanvas');
