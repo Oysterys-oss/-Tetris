@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>俄羅斯方塊 (手機支援版)</title>
+    <title>復古掌機版俄羅斯方塊</title>
     <style>
         body {
-            background-color: #202028;
-            color: #fff;
-            font-family: sans-serif;
+            background-color: #2b2b2b;
+            color: #333;
+            font-family: 'Courier New', Courier, monospace;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -18,116 +18,214 @@
             touch-action: manipulation;
         }
 
-        h2 {
-            margin: 5px 0;
-            font-size: 24px;
+        /* 掌機外殼容器 */
+        .handheld-shell {
+            background-color: #d1c7bd; /* 經典復古米灰色機身 */
+            border: 4px solid #8c8275;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 2px 5px rgba(255,255,255,0.6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 320px;
         }
 
-        .game-container {
+        .brand-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        /* 液晶螢幕外框 */
+        .screen-frame {
+            background-color: #8b956d; /* 經典復古液晶螢幕底色 (軍綠灰) */
+            border: 4px solid #3e4431;
+            border-radius: 6px;
+            padding: 8px;
             display: flex;
-            background: #000;
-            border: 4px solid #444;
-            box-shadow: 0 0 20px rgba(0,0,0,0.8);
-            max-width: 100%;
+            box-shadow: inset 0 3px 6px rgba(0,0,0,0.4);
         }
 
         canvas {
             display: block;
-            background: #111;
-            width: 240px;
-            height: 400px;
+            background: #9cad78; /* 螢幕亮起時的顏色 */
         }
 
-        .side-panel {
-            padding: 15px;
+        /* 側邊資訊面板 */
+        .lcd-panel {
+            margin-left: 10px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            width: 110px;
+            width: 80px;
+            font-size: 11px;
+            color: #222;
         }
 
-        .score-board {
-            font-size: 18px;
+        .lcd-box {
+            background: #7a8a5e;
+            border: 2px solid #3e4431;
+            padding: 4px;
+            border-radius: 3px;
+            text-align: center;
+        }
+
+        .lcd-box span {
+            display: block;
             font-weight: bold;
+            font-size: 14px;
+            color: #111;
         }
 
-        .controls {
-            font-size: 13px;
-            color: #ccc;
-            line-height: 1.4;
+        /* 掌機操作按鈕區 */
+        .controls-area {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 20px;
+            align-items: center;
         }
 
-        /* 手機觸控按鈕樣式 */
-        .touch-controls {
-            display: grid;
-            grid-template-columns: repeat(3, 70px);
-            grid-gap: 10px;
-            margin-top: 15px;
+        /* 十字方向鍵群組 */
+        .d-pad {
+            position: relative;
+            width: 110px;
+            height: 110px;
         }
 
-        .touch-btn {
-            background-color: #333;
-            color: white;
-            border: 2px solid #555;
-            border-radius: 10px;
-            font-size: 20px;
-            height: 60px;
+        .pad-btn {
+            position: absolute;
+            background-color: #4a453f;
+            color: #fff;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
+            box-shadow: 0 3px 0 #2b2723;
             user-select: none;
             -webkit-user-select: none;
         }
 
-        .touch-btn:active {
-            background-color: #555;
+        .pad-btn:active {
+            box-shadow: 0 1px 0 #2b2723;
+            transform: translateY(2px);
         }
 
-        .btn-wide {
-            grid-column: span 3;
-            height: 50px;
-            font-size: 16px;
+        #btnUp { top: 0; left: 35px; width: 40px; height: 35px; border-radius: 4px 4px 0 0; }
+        #btnDown { bottom: 0; left: 35px; width: 40px; height: 35px; border-radius: 0 0 4px 4px; }
+        #btnLeft { top: 35px; left: 0; width: 35px; height: 40px; border-radius: 4px 0 0 4px; }
+        #btnRight { top: 35px; right: 0; width: 35px; height: 40px; border-radius: 0 4px 4px 0; }
+        
+        /* 十字鍵中心裝飾 */
+        .pad-center {
+            position: absolute;
+            top: 35px;
+            left: 35px;
+            width: 40px;
+            height: 40px;
+            background-color: #4a453f;
+        }
+
+        /* 動作按鈕 (旋轉與落地) */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .action-btn {
+            width: 65px;
+            height: 65px;
+            background-color: #a63a3a; /* 復古紅按鈕 */
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #6e2525;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .action-btn:active {
+            box-shadow: 0 1px 0 #6e2525;
+            transform: translateY(3px);
+        }
+
+        .action-btn.blue {
+            background-color: #3a69a6;
+            box-shadow: 0 4px 0 #23426e;
+        }
+        .action-btn.blue:active {
+            box-shadow: 0 1px 0 #23426e;
         }
     </style>
 </head>
 <body>
 
-    <h2>🧱 俄羅斯方塊</h2>
-    <div class="game-container">
-        <canvas id="tetris" width="240" height="400"></canvas>
-        <div class="side-panel">
-            <div class="score-board">
-                分數: <span id="score">0</span>
-            </div>
-            <div class="controls">
-                <b>電腦操作：</b><br>
-                ← → 移動<br>
-                ↑ 旋轉<br>
-                ↓ 加速<br>
-                空白鍵: 落地
+    <div class="handheld-shell">
+        <div class="brand-title">★ TETRIS CLASSIC ★</div>
+        
+        <!-- 液晶螢幕區 -->
+        <div class="screen-frame">
+            <canvas id="tetris" width="150" height="250"></canvas>
+            <div class="lcd-panel">
+                <div class="lcd-box">
+                    SCORE
+                    <span id="score">0</span>
+                </div>
+                <div class="lcd-box" style="margin-top: 10px;">
+                    LEVEL
+                    <span id="level">1</span>
+                </div>
+                <div style="font-size: 10px; color: #333; margin-top: 15px; line-height: 1.3;">
+                    <b>KEYBOARD:</b><br>
+                    ←→ 移動<br>
+                    ↑ 旋轉<br>
+                    ↓ 加速<br>
+                    空白 落地
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="touch-controls">
-        <div></div>
-        <button class="touch-btn" id="btnRotate">🔄 轉</button>
-        <div></div>
-        <button class="touch-btn" id="btnLeft">◀</button>
-        <button class="touch-btn" id="btnDown">▼</button>
-        <button class="touch-btn" id="btnRight">▶</button>
-        <button class="touch-btn btn-wide" id="btnDrop">💥 直接落地</button>
+        <!-- 實體按鈕操控區 -->
+        <div class="controls-area">
+            <!-- 十字方向鍵 -->
+            <div class="d-pad">
+                <button class="pad-btn" id="btnUp">▲</button>
+                <button class="pad-btn" id="btnLeft">◀</button>
+                <div class="pad-center"></div>
+                <button class="pad-btn" id="btnRight">▶</button>
+                <button class="pad-btn" id="btnDown">▼</button>
+            </div>
+
+            <!-- 右側功能鍵 -->
+            <div class="action-buttons">
+                <button class="action-btn blue" id="btnRotate">轉 旋</button>
+                <button class="action-btn" id="btnDrop">落 下</button>
+            </div>
+        </div>
     </div>
 
     <script>
         const canvas = document.getElementById('tetris');
         const context = canvas.getContext('2d');
         
-        context.scale(20, 20);
+        // 放大 10 倍 (網格 10x20，畫布 100x200 稍微調整)
+        context.scale(12.5, 12.5);
 
         function updateScore() {
             document.getElementById('score').innerText = player.score;
+            document.getElementById('level').innerText = Math.floor(player.score / 50) + 1;
         }
 
         function collide(arena, player) {
@@ -202,15 +300,17 @@
             matrix.forEach((row, y) => {
                 row.forEach((value, x) => {
                     if (value !== 0) {
-                        context.fillStyle = colors[value];
-                        context.fillRect(x + offset.x, y + offset.y, 1, 1);
+                        // 復古單色風格：用深色實心方塊模擬液晶點陣
+                        context.fillStyle = '#2c3220';
+                        context.fillRect(x + offset.x, y + offset.y, 0.9, 0.9);
                     }
                 });
             });
         }
 
         function draw() {
-            context.fillStyle = '#111';
+            // 螢幕背景色
+            context.fillStyle = '#9cad78';
             context.fillRect(0, 0, canvas.width, canvas.height);
 
             drawMatrix(arena, {x: 0, y: 0});
@@ -317,7 +417,7 @@
         }
 
         let dropCounter = 0;
-        let dropInterval = 1000;
+        let dropInterval = 800;
         let lastTime = 0;
 
         function update(time = 0) {
@@ -333,18 +433,7 @@
             requestAnimationFrame(update);
         }
 
-        const colors = [
-            null,
-            '#FF0D72',
-            '#0DC2FF',
-            '#0DFF72',
-            '#F538FF',
-            '#FF8E0D',
-            '#FFE138',
-            '#3877FF',
-        ];
-
-        const arena = createMatrix(12, 20);
+        const arena = createMatrix(10, 20);
 
         const player = {
             pos: {x: 0, y: 0},
@@ -352,25 +441,20 @@
             score: 0,
         };
 
-        // 鍵盤事件（電腦端）
+        // 鍵盤操控
         document.addEventListener('keydown', event => {
-            if (event.key === 'ArrowLeft') {
-                playerMove(-1);
-            } else if (event.key === 'ArrowRight') {
-                playerMove(1);
-            } else if (event.key === 'ArrowDown') {
-                playerDrop();
-            } else if (event.key === 'ArrowUp') {
-                playerRotate(1);
-            } else if (event.code === 'Space') {
-                playerDropInstant();
-            }
+            if (event.key === 'ArrowLeft') playerMove(-1);
+            else if (event.key === 'ArrowRight') playerMove(1);
+            else if (event.key === 'ArrowDown') playerDrop();
+            else if (event.key === 'ArrowUp') playerRotate(1);
+            else if (event.code === 'Space') playerDropInstant();
         });
 
-        // 觸控按鈕事件（手機端）
+        // 掌機虛擬按鈕操控
         document.getElementById('btnLeft').addEventListener('click', () => playerMove(-1));
         document.getElementById('btnRight').addEventListener('click', () => playerMove(1));
         document.getElementById('btnDown').addEventListener('click', () => playerDrop());
+        document.getElementById('btnUp').addEventListener('click', () => playerRotate(1));
         document.getElementById('btnRotate').addEventListener('click', () => playerRotate(1));
         document.getElementById('btnDrop').addEventListener('click', () => playerDropInstant());
 
