@@ -2,8 +2,8 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>俄羅斯方塊 (放大版)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>俄羅斯方塊 (手機支援版)</title>
     <style>
         body {
             background-color: #202028;
@@ -13,13 +13,14 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            touch-action: manipulation;
         }
 
         h2 {
-            margin-bottom: 10px;
-            font-size: 28px;
+            margin: 5px 0;
+            font-size: 24px;
         }
 
         .game-container {
@@ -27,31 +28,66 @@
             background: #000;
             border: 4px solid #444;
             box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            max-width: 100%;
         }
 
-        /* 放大畫布尺寸：從 240x400 改為 360x600 */
         canvas {
             display: block;
             background: #111;
+            width: 240px;
+            height: 400px;
         }
 
         .side-panel {
-            padding: 25px;
+            padding: 15px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            width: 160px;
+            width: 110px;
         }
 
         .score-board {
-            font-size: 22px;
+            font-size: 18px;
             font-weight: bold;
         }
 
         .controls {
-            font-size: 15px;
+            font-size: 13px;
             color: #ccc;
-            line-height: 1.6;
+            line-height: 1.4;
+        }
+
+        /* 手機觸控按鈕樣式 */
+        .touch-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 70px);
+            grid-gap: 10px;
+            margin-top: 15px;
+        }
+
+        .touch-btn {
+            background-color: #333;
+            color: white;
+            border: 2px solid #555;
+            border-radius: 10px;
+            font-size: 20px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .touch-btn:active {
+            background-color: #555;
+        }
+
+        .btn-wide {
+            grid-column: span 3;
+            height: 50px;
+            font-size: 16px;
         }
     </style>
 </head>
@@ -59,28 +95,36 @@
 
     <h2>🧱 俄羅斯方塊</h2>
     <div class="game-container">
-        <!-- 畫布大小放大 1.5 倍 (360x600) -->
-        <canvas id="tetris" width="360" height="600"></canvas>
+        <canvas id="tetris" width="240" height="400"></canvas>
         <div class="side-panel">
             <div class="score-board">
                 分數: <span id="score">0</span>
             </div>
             <div class="controls">
-                <b>操作說明：</b><br>
-                ← → : 移動<br>
-                ↑ : 旋轉<br>
-                ↓ : 加速<br>
+                <b>電腦操作：</b><br>
+                ← → 移動<br>
+                ↑ 旋轉<br>
+                ↓ 加速<br>
                 空白鍵: 落地
             </div>
         </div>
+    </div>
+
+    <div class="touch-controls">
+        <div></div>
+        <button class="touch-btn" id="btnRotate">🔄 轉</button>
+        <div></div>
+        <button class="touch-btn" id="btnLeft">◀</button>
+        <button class="touch-btn" id="btnDown">▼</button>
+        <button class="touch-btn" id="btnRight">▶</button>
+        <button class="touch-btn btn-wide" id="btnDrop">💥 直接落地</button>
     </div>
 
     <script>
         const canvas = document.getElementById('tetris');
         const context = canvas.getContext('2d');
         
-        // 將每個方塊的像素大小從 20 放大到 30 (30 * 12 = 360, 30 * 20 = 600)
-        context.scale(30, 30);
+        context.scale(20, 20);
 
         function updateScore() {
             document.getElementById('score').innerText = player.score;
@@ -308,6 +352,7 @@
             score: 0,
         };
 
+        // 鍵盤事件（電腦端）
         document.addEventListener('keydown', event => {
             if (event.key === 'ArrowLeft') {
                 playerMove(-1);
@@ -321,6 +366,13 @@
                 playerDropInstant();
             }
         });
+
+        // 觸控按鈕事件（手機端）
+        document.getElementById('btnLeft').addEventListener('click', () => playerMove(-1));
+        document.getElementById('btnRight').addEventListener('click', () => playerMove(1));
+        document.getElementById('btnDown').addEventListener('click', () => playerDrop());
+        document.getElementById('btnRotate').addEventListener('click', () => playerRotate(1));
+        document.getElementById('btnDrop').addEventListener('click', () => playerDropInstant());
 
         playerReset();
         updateScore();
