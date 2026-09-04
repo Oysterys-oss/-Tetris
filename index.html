@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>復古掌機版俄羅斯方塊 (含 Game Over)</title>
+    <title>復古掌機版俄羅斯方塊 (含 GAME OVER 顯示)</title>
     <style>
         body {
             background-color: #2b2b2b;
@@ -46,12 +46,46 @@
             display: flex;
             gap: 8px;
             box-shadow: inset 0 3px 6px rgba(0,0,0,0.4);
+            position: relative;
         }
 
         canvas#tetris {
             display: block;
             background: #9cad78;
             border: 2px solid #3e4431;
+        }
+
+        /* GAME OVER 覆蓋提示樣式 */
+        .game-over-overlay {
+            position: absolute;
+            top: 50%;
+            left: 6px;
+            transform: translateY(-50%);
+            width: 140px;
+            background: rgba(156, 173, 120, 0.92);
+            color: #111;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            text-align: center;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+            border: 2px dashed #2c3220;
+        }
+
+        .game-over-overlay h3 {
+            margin: 0 0 5px 0;
+            font-size: 16px;
+            letter-spacing: 1px;
+            color: #a63a3a;
+        }
+
+        .game-over-overlay p {
+            margin: 0;
+            font-size: 9px;
+            color: #333;
         }
 
         .lcd-panel {
@@ -178,6 +212,12 @@
         <div class="screen-frame">
             <canvas id="tetris" width="140" height="280"></canvas>
             
+            <!-- GAME OVER 畫面提示 -->
+            <div id="gameOverOverlay" class="game-over-overlay">
+                <h3>GAME OVER</h3>
+                <p>按下任意鍵<br>重新開始</p>
+            </div>
+
             <div class="lcd-panel">
                 <div class="lcd-box">
                     SCORE
@@ -221,6 +261,8 @@
         const nextCanvas = document.getElementById('nextCanvas');
         const nextContext = nextCanvas.getContext('2d');
         nextContext.scale(14, 14);
+
+        let isGameOver = false;
 
         function updateScore() {
             document.getElementById('score').innerText = player.score;
@@ -322,6 +364,7 @@
         }
 
         function playerDrop() {
+            if (isGameOver) return;
             player.pos.y++;
             if (collide(arena, player)) {
                 player.pos.y--;
@@ -334,6 +377,7 @@
         }
 
         function playerDropInstant() {
+            if (isGameOver) return;
             while (!collide(arena, player)) {
                 player.pos.y++;
             }
@@ -346,6 +390,7 @@
         }
 
         function playerMove(dir) {
+            if (isGameOver) return;
             player.pos.x += dir;
             if (collide(arena, player)) {
                 player.pos.x -= dir;
@@ -355,6 +400,21 @@
         function getRandomPiece() {
             const pieces = 'TJLOSZI';
             return createPiece(pieces[(pieces.length * Math.random()) | 0]);
+        }
+
+        function triggerGameOver() {
+            isGameOver = true;
+            document.getElementById('gameOverOverlay').style.display = 'flex';
+        }
+
+        function restartGame() {
+            arena.forEach(row => row.fill(0));
+            player.score = 0;
+            isGameOver = false;
+            document.getElementById('gameOverOverlay').style.display = 'none';
+            player.nextMatrix = null;
+            playerReset();
+            updateScore();
         }
 
         function playerReset() {
@@ -368,16 +428,13 @@
             player.pos.y = 0;
             player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
             
-            // 修正：當新方塊一生成就發生碰撞，代表遊戲結束 (Game Over)
             if (collide(arena, player)) {
-                alert("GAME OVER 遊戲結束！\n您的最終分數是: " + player.score);
-                arena.forEach(row => row.fill(0));
-                player.score = 0;
-                updateScore();
+                triggerGameOver();
             }
         }
 
         function playerRotate(dir) {
+            if (isGameOver) return;
             const posX = player.pos.x;
             let offset = 1;
             rotate(player.matrix, dir);
@@ -413,12 +470,14 @@
             const deltaTime = time - lastTime;
             lastTime = time;
 
-            dropCounter += deltaTime;
-            if (dropCounter > dropInterval) {
-                playerDrop();
+            if (!isGameOver) {
+                dropCounter += deltaTime;
+                if (dropCounter > dropInterval) {
+                    playerDrop();
+                }
+                draw();
             }
 
-            draw();
             requestAnimationFrame(update);
         }
 
@@ -431,7 +490,12 @@
             score: 0,
         };
 
+        // 鍵盤操控與重新開始
         document.addEventListener('keydown', event => {
+            if (isGameOver) {
+                restartGame();
+                return;
+            }
             if (event.key === 'ArrowLeft') playerMove(-1);
             else if (event.key === 'ArrowRight') playerMove(1);
             else if (event.key === 'ArrowDown') playerDrop();
@@ -439,12 +503,21 @@
             else if (event.code === 'Space') playerDropInstant();
         });
 
-        document.getElementById('btnLeft').addEventListener('click', () => playerMove(-1));
-        document.getElementById('btnRight').addEventListener('click', () => playerMove(1));
-        document.getElementById('btnDown').addEventListener('click', () => playerDrop());
-        document.getElementById('btnUp').addEventListener('click', () => playerRotate(1));
-        document.getElementById('btnRotate').addEventListener('click', () => playerRotate(1));
-        document.getElementById('btnDrop').addEventListener('click', () => playerDropInstant());
+        // 觸控按鈕操控與重新開始
+        function handleAction(action) {
+            if (isGameOver) {
+                restartGame();
+                return;
+            }
+            action();
+        }
+
+        document.getElementById('btnLeft').addEventListener('click', () => handleAction(() => playerMove(-1)));
+        document.getElementById('btnRight').addEventListener('click', () => handleAction(() => playerMove(1)));
+        document.getElementById('btnDown').addEventListener('click', () => handleAction(() => playerDrop()));
+        document.getElementById('btnUp').addEventListener('click', () => handleAction(() => playerRotate(1)));
+        document.getElementById('btnRotate').addEventListener('click', () => handleAction(() => playerRotate(1)));
+        document.getElementById('btnDrop').addEventListener('click', () => handleAction(() => playerDropInstant()));
 
         playerReset();
         updateScore();
