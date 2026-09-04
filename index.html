@@ -18,12 +18,12 @@
             touch-action: manipulation;
         }
 
-        /* 經典 Game Boy 機身外殼 (增加上下 padding，讓機身長度拉長) */
+        /* 經典 Game Boy 機身外殼 */
         .handheld-shell {
             background-color: #e0ded8;
             border: 4px solid #b5b2a8;
             border-radius: 16px 16px 55px 16px;
-            padding: 26px 24px 45px 24px; /* 增加底部 padding 使機身長度拉長 */
+            padding: 26px 24px 45px 24px;
             box-shadow: 0 16px 40px rgba(0,0,0,0.6), inset 0 2px 6px rgba(255,255,255,0.8);
             display: flex;
             flex-direction: column;
@@ -166,7 +166,7 @@
         /* 鏡面下方的 Nintendo GAME BOY 標誌 */
         .nintendo-logo-area {
             width: 346px;
-            padding: 16px 0 14px 15px; /* 微調上下留白，讓機身長度更協調 */
+            padding: 16px 0 14px 15px;
             display: flex;
             align-items: baseline;
             gap: 6px;
@@ -379,6 +379,7 @@
             </div>
 
             <div class="screen-lcd">
+                <!-- 畫布總寬度維持 246 (10格遊戲區 + 6.4格右側資訊欄) -->
                 <canvas id="tetris" width="246" height="294"></canvas>
                 
                 <div id="gameOverOverlay" class="overlay-screen">
@@ -452,7 +453,8 @@
         let isGameOver = false;
         let isPaused = false;
 
-        const arena = createMatrix(15, 18);
+        // 嚴格設定遊戲區寬度為 10 格，高度 19.6 格
+        const arena = createMatrix(10, 19.6);
 
         const player = {
             pos: {x: 0, y: 0},
@@ -491,18 +493,19 @@
         }
 
         function drawUI() {
+            // 分隔線畫在第 10 格的位置
             context.fillStyle = '#3e4431';
-            context.fillRect(10, 0, 0.2, 18);
+            context.fillRect(10, 0, 0.2, 19.6);
 
             context.font = '0.7px "Courier New"';
             context.fillStyle = '#222';
             context.fillText('SCORE', 11.0, 1.5);
             
             context.fillStyle = '#7a8a5e';
-            context.fillRect(10.6, 2, 3.4, 2);
+            context.fillRect(10.6, 2, 5.0, 2);
             context.strokeStyle = '#3e4431';
             context.lineWidth = 0.1;
-            context.strokeRect(10.6, 2, 3.4, 2);
+            context.strokeRect(10.6, 2, 5.0, 2);
 
             context.fillStyle = '#111';
             context.font = 'bold 0.9px "Courier New"';
@@ -513,11 +516,11 @@
             context.fillText('NEXT', 11.4, 5.5);
 
             context.fillStyle = '#7a8a5e';
-            context.fillRect(10.6, 6, 3.4, 4);
-            context.strokeRect(10.6, 6, 3.4, 4);
+            context.fillRect(10.6, 6, 5.0, 4);
+            context.strokeRect(10.6, 6, 5.0, 4);
 
             if (player.nextMatrix) {
-                const offsetX = 10.6 + (3.4 - player.nextMatrix[0].length) / 2;
+                const offsetX = 10.6 + (5.0 - player.nextMatrix[0].length) / 2;
                 const offsetY = 6 + (4 - player.nextMatrix.length) / 2;
                 drawMatrix(player.nextMatrix, {x: offsetX, y: offsetY});
             }
@@ -527,8 +530,8 @@
             context.fillText('LEVEL', 11.2, 11.5);
 
             context.fillStyle = '#7a8a5e';
-            context.fillRect(10.6, 12, 3.4, 2);
-            context.strokeRect(10.6, 12, 3.4, 2);
+            context.fillRect(10.6, 12, 5.0, 2);
+            context.strokeRect(10.6, 12, 5.0, 2);
 
             context.fillStyle = '#111';
             context.font = 'bold 0.9px "Courier New"';
@@ -539,8 +542,8 @@
             context.fillStyle = '#9cad78';
             context.fillRect(0, 0, canvas.width / blockSize, canvas.height / blockSize);
 
-            for (let y = 0; y < 18; y++) {
-                for (let x = 0; x < 10; x++) {
+            for (let y = 0; y < arena.length; y++) {
+                for (let x = 0; x < arena[y].length; x++) {
                     if (arena[y][x] !== 0) {
                         context.fillStyle = '#2c3220';
                         context.fillRect(x, y, 0.9, 0.9);
