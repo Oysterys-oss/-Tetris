@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GameBoy 經典俄羅斯方塊</title>
+    <title>Retro GameBoy Tetris</title>
     <style>
         body {
             background-color: #2b2b2b;
@@ -18,36 +18,41 @@
             touch-action: manipulation;
         }
 
+        /* 經典 Game Boy 機身外殼 */
         .handheld-shell {
-            background-color: #d1c7bd;
+            background-color: #c0b8b0;
             border: 4px solid #8c8275;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 2px 5px rgba(255,255,255,0.6);
+            border-radius: 12px 12px 40px 12px;
+            padding: 25px 20px 30px 20px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.6), inset 0 2px 6px rgba(255,255,255,0.7);
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 330px;
+            width: 310px;
+            position: relative;
         }
 
-        .brand-title {
-            font-size: 13px;
-            font-weight: bold;
-            color: #555;
-            margin-bottom: 10px;
-            letter-spacing: 2px;
+        /* 機身頂部裝飾線 */
+        .handheld-shell::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 20px;
+            right: 20px;
+            height: 2px;
+            background: #aba296;
+            box-shadow: 0 2px 0 #d0c8be;
         }
 
         .screen-frame {
             background-color: #8b956d;
-            border: 4px solid #3e4431;
-            border-radius: 6px;
-            padding: 6px;
-            box-shadow: inset 0 3px 6px rgba(0,0,0,0.4);
+            border: 5px solid #33382b;
+            border-radius: 4px 4px 20px 4px;
+            padding: 8px;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.5);
             position: relative;
         }
 
-        /* 統一的大畫布，包含遊戲區與右側資訊欄 */
         canvas#tetris {
             display: block;
             background: #9cad78;
@@ -86,58 +91,110 @@
             line-height: 1.4;
         }
 
+        /* 螢幕下方的任天堂商標區域 */
+        .brand-area {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 18px 0 22px 0;
+            padding: 0 5px;
+        }
+
+        .battery-led {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 8px;
+            color: #666;
+            font-weight: bold;
+        }
+
+        .led-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #a63a3a;
+            border-radius: 50%;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .nintendo-logo {
+            font-family: sans-serif;
+            font-style: italic;
+            font-weight: 900;
+            font-size: 15px;
+            color: #1a155c;
+            letter-spacing: -0.5px;
+        }
+
+        .nintendo-logo span {
+            font-size: 10px;
+            font-style: normal;
+            vertical-align: super;
+        }
+
+        /* 操作區 (十字鍵與斜向 A/B 鈕) */
         .controls-area {
             display: flex;
             justify-content: space-between;
             width: 100%;
-            margin-top: 20px;
-            align-items: center;
+            align-items: flex-end;
+            padding: 0 5px;
         }
 
         .d-pad {
             position: relative;
-            width: 100px;
-            height: 100px;
+            width: 96px;
+            height: 96px;
         }
 
         .pad-btn {
             position: absolute;
-            background-color: #4a453f;
-            color: #fff;
+            background-color: #2b2b2b;
+            color: #444;
             border: none;
-            font-weight: bold;
+            font-size: 10px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 3px 0 #2b2723;
+            box-shadow: 0 2px 0 #111;
             user-select: none;
             -webkit-user-select: none;
         }
 
         .pad-btn:active {
-            box-shadow: 0 1px 0 #2b2723;
+            box-shadow: 0 0 0 #111;
             transform: translateY(2px);
         }
 
-        #btnUp { top: 0; left: 30px; width: 40px; height: 32px; border-radius: 4px 4px 0 0; }
-        #btnDown { bottom: 0; left: 30px; width: 40px; height: 32px; border-radius: 0 0 4px 4px; }
-        #btnLeft { top: 32px; left: 0; width: 32px; height: 40px; border-radius: 4px 0 0 4px; }
-        #btnRight { top: 32px; right: 0; width: 32px; height: 40px; border-radius: 0 4px 4px 0; }
+        #btnUp { top: 0; left: 32px; width: 32px; height: 32px; border-radius: 3px 3px 0 0; }
+        #btnDown { bottom: 0; left: 32px; width: 32px; height: 32px; border-radius: 0 0 3px 3px; }
+        #btnLeft { top: 32px; left: 0; width: 32px; height: 32px; border-radius: 3px 0 0 3px; }
+        #btnRight { top: 32px; right: 0; width: 32px; height: 32px; border-radius: 0 3px 3px 0; }
         
         .pad-center {
             position: absolute;
             top: 32px;
             left: 32px;
-            width: 36px;
-            height: 36px;
-            background-color: #4a453f;
+            width: 32px;
+            height: 32px;
+            background-color: #2b2b2b;
         }
 
-        .action-buttons {
+        /* 右側 A/B 鈕與下方 Select/Start 區 */
+        .action-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* 經典斜向 A/B 鈕 */
+        .ab-buttons {
             display: flex;
             gap: 12px;
-            align-items: center;
+            transform: rotate(-25deg); /*還原經典斜向角度*/
             margin-right: 5px;
         }
 
@@ -149,15 +206,15 @@
         }
 
         .action-btn {
-            width: 48px;
-            height: 48px;
-            background-color: #8b3a62;
+            width: 42px;
+            height: 42px;
+            background-color: #6b2d5c; /* Game Boy 紫紅經典色 */
             color: white;
             border: none;
             border-radius: 50%;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: bold;
-            box-shadow: 0 4px 0 #542239;
+            box-shadow: 0 4px 0 #3d1533;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -167,35 +224,61 @@
         }
 
         .action-btn:active {
-            box-shadow: 0 1px 0 #542239;
+            box-shadow: 0 1px 0 #3d1533;
             transform: translateY(3px);
         }
 
-        .action-btn.yellow {
-            background-color: #b38f27;
-            box-shadow: 0 4px 0 #735a17;
-            font-size: 10px;
-            width: 40px;
-            height: 40px;
-        }
-        .action-btn.yellow:active {
-            box-shadow: 0 1px 0 #735a17;
+        .btn-label {
+            font-size: 9px;
+            color: #1a155c;
+            font-weight: bold;
+            transform: rotate(25deg); /* 把字轉正 */
         }
 
-        .btn-label {
-            font-size: 10px;
-            color: #555;
+        /* 下方長條狀 SELECT (暫停) 與 START 鈕 */
+        .system-buttons {
+            display: flex;
+            gap: 12px;
+            transform: rotate(-25deg);
+            margin-right: 15px;
+            margin-top: -5px;
+        }
+
+        .sys-btn-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .sys-btn {
+            width: 36px;
+            height: 14px;
+            background-color: #666;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 0 #333;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .sys-btn:active {
+            box-shadow: 0 0 0 #333;
+            transform: translateY(2px);
+        }
+
+        .sys-label {
+            font-size: 7px;
+            color: #1a155c;
             font-weight: bold;
+            transform: rotate(25deg);
         }
     </style>
 </head>
 <body>
 
     <div class="handheld-shell">
-        <div class="brand-title">★ TETRIS CLASSIC ★</div>
-        
         <div class="screen-frame">
-            <!-- 單一主畫布：寬 210, 高 280 (左側 140 遊戲區 + 右側 70 資訊面板) -->
             <canvas id="tetris" width="210" height="280"></canvas>
             
             <div id="gameOverOverlay" class="overlay-screen">
@@ -209,6 +292,14 @@
             </div>
         </div>
 
+        <div class="brand-area">
+            <div class="battery-led">
+                <div class="led-dot"></div>
+                BATTERY
+            </div>
+            <div class="nintendo-logo">Nintendo <span>GAME BOY</span></div>
+        </div>
+
         <div class="controls-area">
             <div class="d-pad">
                 <button class="pad-btn" id="btnUp">▲</button>
@@ -218,18 +309,27 @@
                 <button class="pad-btn" id="btnDown">▼</button>
             </div>
 
-            <div class="action-buttons">
-                <div class="action-btn-group">
-                    <button class="action-btn yellow" id="btnPause">暫停</button>
-                    <span class="btn-label">SELECT</span>
+            <div class="action-container">
+                <div class="ab-buttons">
+                    <div class="action-btn-group">
+                        <button class="action-btn" id="btnRotate">B</button>
+                        <span class="btn-label">B</span>
+                    </div>
+                    <div class="action-btn-group">
+                        <button class="action-btn" id="btnDrop">A</button>
+                        <span class="btn-label">A</span>
+                    </div>
                 </div>
-                <div class="action-btn-group">
-                    <button class="action-btn" id="btnRotate">轉旋</button>
-                    <span class="btn-label">B</span>
-                </div>
-                <div class="action-btn-group">
-                    <button class="action-btn" id="btnDrop">落下</button>
-                    <span class="btn-label">A</span>
+
+                <div class="system-buttons">
+                    <div class="sys-btn-group">
+                        <button class="sys-btn" id="btnPause"></button>
+                        <span class="sys-label">SELECT</span>
+                    </div>
+                    <div class="sys-btn-group">
+                        <button class="sys-btn" id="btnRestart"></button>
+                        <span class="sys-label">START</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -244,7 +344,7 @@
         let isGameOver = false;
         let isPaused = false;
 
-        const arena = createMatrix(15, 20); // 10格遊戲區 + 5格右側面板空間
+        const arena = createMatrix(15, 20);
 
         const player = {
             pos: {x: 0, y: 0},
@@ -262,21 +362,13 @@
         }
 
         function createPiece(type) {
-            if (type === 'T') {
-                return [[0, 1, 0], [1, 1, 1], [0, 0, 0]];
-            } else if (type === 'O') {
-                return [[2, 2], [2, 2]];
-            } else if (type === 'L') {
-                return [[0, 0, 3], [3, 3, 3], [0, 0, 0]];
-            } else if (type === 'J') {
-                return [[4, 0, 0], [4, 4, 4], [0, 0, 0]];
-            } else if (type === 'I') {
-                return [[0, 0, 0, 0], [5, 5, 5, 5], [0, 0, 0, 0], [0, 0, 0, 0]];
-            } else if (type === 'S') {
-                return [[0, 6, 6], [6, 6, 0], [0, 0, 0]];
-            } else if (type === 'Z') {
-                return [[7, 7, 0], [0, 7, 7], [0, 0, 0]];
-            }
+            if (type === 'T') return [[0, 1, 0], [1, 1, 1], [0, 0, 0]];
+            else if (type === 'O') return [[2, 2], [2, 2]];
+            else if (type === 'L') return [[0, 0, 3], [3, 3, 3], [0, 0, 0]];
+            else if (type === 'J') return [[4, 0, 0], [4, 4, 4], [0, 0, 0]];
+            else if (type === 'I') return [[0, 0, 0, 0], [5, 5, 5, 5], [0, 0, 0, 0], [0, 0, 0, 0]];
+            else if (type === 'S') return [[0, 6, 6], [6, 6, 0], [0, 0, 0]];
+            else if (type === 'Z') return [[7, 7, 0], [0, 7, 7], [0, 0, 0]];
         }
 
         function drawMatrix(matrix, offset) {
@@ -291,11 +383,9 @@
         }
 
         function drawUI() {
-            // 繪製右側面板分隔線
             context.fillStyle = '#3e4431';
             context.fillRect(10, 0, 0.2, 20);
 
-            // 顯示 SCORE
             context.font = '0.7px "Courier New"';
             context.fillStyle = '#222';
             context.fillText('SCORE', 11.2, 1.5);
@@ -310,7 +400,6 @@
             context.font = 'bold 0.9px "Courier New"';
             context.fillText(player.score, 11.5, 3.3);
 
-            // 顯示 NEXT 預告
             context.font = '0.7px "Courier New"';
             context.fillStyle = '#222';
             context.fillText('NEXT', 11.8, 5.5);
@@ -325,7 +414,6 @@
                 drawMatrix(player.nextMatrix, {x: offsetX, y: offsetY});
             }
 
-            // 顯示 LEVEL
             context.font = '0.7px "Courier New"';
             context.fillStyle = '#222';
             context.fillText('LEVEL', 11.5, 11.5);
@@ -343,7 +431,6 @@
             context.fillStyle = '#9cad78';
             context.fillRect(0, 0, canvas.width / blockSize, canvas.height / blockSize);
 
-            // 僅繪製左側 10 欄作為遊戲網格內容
             for (let y = 0; y < 20; y++) {
                 for (let x = 0; x < 10; x++) {
                     if (arena[y][x] !== 0) {
@@ -365,8 +452,7 @@
             const o = player.pos;
             for (let y = 0; y < m.length; ++y) {
                 for (let x = 0; x < m[y].length; ++x) {
-                    if (m[y][x] !== 0 &&
-                       (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0) {
+                    if (m[y][x] !== 0 && (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0) {
                         return true;
                     }
                 }
@@ -388,14 +474,11 @@
             let rowCount = 1;
             outer: for (let y = arena.length - 1; y > 0; --y) {
                 for (let x = 0; x < 10; ++x) {
-                    if (arena[y][x] === 0) {
-                        continue outer;
-                    }
+                    if (arena[y][x] === 0) continue outer;
                 }
                 const row = arena.splice(y, 1)[0].fill(0);
                 arena.unshift(row);
                 ++y;
-
                 player.score += rowCount * 10;
                 rowCount *= 2;
             }
@@ -498,11 +581,8 @@
                     [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]];
                 }
             }
-            if (dir > 0) {
-                matrix.forEach(row => row.reverse());
-            } else {
-                matrix.reverse();
-            }
+            if (dir > 0) matrix.forEach(row => row.reverse());
+            else matrix.reverse();
         }
 
         let dropCounter = 0;
@@ -545,8 +625,9 @@
             else if (event.code === 'Space') playerDropInstant();
         });
 
-        // 觸控按鈕事件
+        // 按鈕綁定
         document.getElementById('btnPause').addEventListener('click', togglePause);
+        document.getElementById('btnRestart').addEventListener('click', restartGame);
         document.getElementById('btnRotate').addEventListener('click', () => { if(isGameOver){ restartGame(); } else { playerRotate(1); } });
         document.getElementById('btnDrop').addEventListener('click', () => { if(isGameOver){ restartGame(); } else { playerDropInstant(); } });
         
