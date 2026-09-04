@@ -48,7 +48,7 @@
         .lens-frame {
             background-color: #2b2d2f;
             border-radius: 6px 6px 40px 6px;
-            padding: 15px 15px 15px 15px;
+            padding: 15px;
             box-shadow: inset 0 3px 6px rgba(0,0,0,0.8);
             display: flex;
             flex-direction: column;
@@ -299,7 +299,6 @@
             height: 115px;
         }
 
-        /* 經典斜向 A/B 鈕 */
         .ab-buttons {
             position: absolute;
             top: 0;
@@ -379,8 +378,8 @@
             </div>
 
             <div class="screen-lcd">
-                <!-- 畫布總寬度維持 246 (10格遊戲區 + 6.4格右側資訊欄) -->
-                <canvas id="tetris" width="246" height="294"></canvas>
+                <!-- 畫布調整為寬 246 (16.4格)，高 300 (20格) -->
+                <canvas id="tetris" width="246" height="300"></canvas>
                 
                 <div id="gameOverOverlay" class="overlay-screen">
                     <h3>GAME OVER</h3>
@@ -453,8 +452,8 @@
         let isGameOver = false;
         let isPaused = false;
 
-        // 嚴格設定遊戲區寬度為 10 格，高度 19.6 格
-        const arena = createMatrix(10, 19.6);
+        // 嚴格設定遊戲區寬度為 10 格，高度為整數 20 格
+        const arena = createMatrix(10, 20);
 
         const player = {
             pos: {x: 0, y: 0},
@@ -493,9 +492,9 @@
         }
 
         function drawUI() {
-            // 分隔線畫在第 10 格的位置
+            // 分隔線畫在第 10 格的位置，高度配合 20 格
             context.fillStyle = '#3e4431';
-            context.fillRect(10, 0, 0.2, 19.6);
+            context.fillRect(10, 0, 0.2, 20);
 
             context.font = '0.7px "Courier New"';
             context.fillStyle = '#222';
@@ -583,7 +582,7 @@
 
         function arenaSweep() {
             let rowCount = 1;
-            outer: for (let y = arena.length - 1; y > 0; --y) {
+            outer: for (let y = arena.length - 1; y >= 0; --y) {
                 for (let x = 0; x < 10; ++x) {
                     if (arena[y][x] === 0) continue outer;
                 }
