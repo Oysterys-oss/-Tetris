@@ -18,12 +18,12 @@
             touch-action: manipulation;
         }
 
-        /* 經典 Game Boy 機身外殼 (維持寬度 390px) */
+        /* 經典 Game Boy 機身外殼 (增加上下 padding，讓機身長度拉長) */
         .handheld-shell {
             background-color: #e0ded8;
             border: 4px solid #b5b2a8;
             border-radius: 16px 16px 55px 16px;
-            padding: 24px 24px 30px 24px;
+            padding: 26px 24px 45px 24px; /* 增加底部 padding 使機身長度拉長 */
             box-shadow: 0 16px 40px rgba(0,0,0,0.6), inset 0 2px 6px rgba(255,255,255,0.8);
             display: flex;
             flex-direction: column;
@@ -166,7 +166,7 @@
         /* 鏡面下方的 Nintendo GAME BOY 標誌 */
         .nintendo-logo-area {
             width: 346px;
-            padding: 14px 0 10px 15px;
+            padding: 16px 0 14px 15px; /* 微調上下留白，讓機身長度更協調 */
             display: flex;
             align-items: baseline;
             gap: 6px;
@@ -248,11 +248,11 @@
             background-color: #2b2b2b;
         }
 
-        /* 中間區域：Select / Start 鍵（大幅向右移至正中央） */
+        /* 中間區域：Select / Start 鍵 */
         .middle-controls {
             position: absolute;
             bottom: 12px;
-            left: 142px; /* 數值加大，讓按鈕明顯往右移 */
+            left: 142px;
             display: flex;
             gap: 16px;
             transform: rotate(-25deg);
@@ -408,7 +408,6 @@
                 <button class="pad-btn" id="btnDown">▼</button>
             </div>
 
-            <!-- 調整後的正中央 Select / Start 鍵 -->
             <div class="middle-controls">
                 <div class="sys-btn-group">
                     <button class="sys-btn" id="btnPause"></button>
