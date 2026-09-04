@@ -3,229 +3,336 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google 小恐龍 (擬真版)</title>
+    <title>俄羅斯方塊</title>
     <style>
         body {
-            margin: 0;
-            background-color: #f7f7f7;
+            background-color: #202028;
+            color: #fff;
+            font-family: sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
-            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
         }
+
         h2 {
-            color: #535353;
             margin-bottom: 5px;
         }
-        canvas {
-            background-color: #fff;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+
+        .game-container {
+            display: flex;
+            background: #000;
+            border: 2px solid #333;
         }
-        .info {
-            margin-top: 10px;
-            color: #777;
-            font-size: 14px;
+
+        canvas {
+            display: block;
+            background: #111;
+        }
+
+        .side-panel {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 120px;
+        }
+
+        .score-board {
+            font-size: 18px;
+        }
+
+        .controls {
+            font-size: 13px;
+            color: #aaa;
+            line-height: 1.5;
         }
     </style>
 </head>
 <body>
 
-    <h2>🦕 Chrome 小恐龍 (擬真 Canvas 版)</h2>
-    <canvas id="gameCanvas" width="800" height="250"></canvas>
-    <div class="info">按下 <b>空白鍵 (Space)</b> 或 <b>↑ 鍵</b> 跳躍，向下鍵降落</div>
+    <h2>俄羅斯方塊</h2>
+    <div class="game-container">
+        <canvas id="tetris" width="240" height="400"></canvas>
+        <div class="side-panel">
+            <div class="score-board">
+                分數: <span id="score">0</span>
+            </div>
+            <div class="controls">
+                <b>操作說明：</b><br>
+                ← → : 移動<br>
+                ↑ : 旋轉<br>
+                ↓ : 加速<br>
+                空白鍵: 直接落下
+            </div>
+        </div>
+    </div>
 
-<script>
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
+    <script>
+        const canvas = document.getElementById('tetris');
+        const context = canvas.getContext('2d');
+        context.scale(20, 20); // 放大 20 倍，讓 12x20 的網格剛好對應 240x400 的畫布
 
-// 遊戲變數
-let score = 0;
-let highScore = 0;
-let gameSpeed = 5;
-let isGameOver = false;
+        // 建立計分板更新
+        function updateScore() {
+            document.getElementById('score').innerText = player.score;
+        }
 
-// 小恐龍物件 (用精緻的像素畫或向量繪製代替方塊)
-let dino = {
-    x: 50,
-    y: 170,
-    width: 40,
-    height: 43,
-    vy: 0,
-    gravity: 0.8,
-    jumpPower: -12,
-    isJumping: false,
-    draw() {
-        // 畫身體
-        ctx.fillStyle = "#535353";
-        ctx.fillRect(this.x + 10, this.y + 10, 25, 25);
-        // 頭部
-        ctx.fillRect(this.x + 25, this.y, 15, 15);
-        // 眼睛
-        ctx.fillStyle = "#fff";
-        ctx.fillRect(this.x + 33, this.y + 3, 3, 3);
-        // 腳 (簡單動態感)
-        ctx.fillStyle = "#535353";
-        if (this.isJumping) {
-            ctx.fillRect(this.x + 12, this.y + 35, 6, 8);
-            ctx.fillRect(this.x + 22, this.y + 35, 6, 8);
-        } else {
-            let frame = Math.floor(Date.now() / 100) % 2;
-            if (frame === 0) {
-                ctx.fillRect(this.x + 12, this.y + 35, 5, 8);
-                ctx.fillRect(this.x + 24, this.y + 35, 5, 6);
-            } else {
-                ctx.fillRect(this.x + 12, this.y + 35, 5, 6);
-                ctx.fillRect(this.x + 24, this.y + 35, 5, 8);
+        // 碰撞偵測
+        function collide(arena, player) {
+            const m = player.matrix;
+            const o = player.pos;
+            for (let y = 0; y < m.length; ++y) {
+                for (let x = 0; x < m[y].length; ++x) {
+                    if (m[y][x] !== 0 &&
+                       (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        // 建立二維陣列
+        function createMatrix(w, h) {
+            const matrix = [];
+            while (h--) {
+                matrix.push(new Array(w).fill(0));
+            }
+            return matrix;
+        }
+
+        // 建立不同形狀的方塊
+        function createPiece(type) {
+            if (type === 'T') {
+                return [
+                    [0, 1, 0],
+                    [1, 1, 1],
+                    [0, 0, 0],
+                ];
+            } else if (type === 'O') {
+                return [
+                    [2, 2],
+                    [2, 2],
+                ];
+            } else if (type === 'L') {
+                return [
+                    [0, 0, 3],
+                    [3, 3, 3],
+                    [0, 0, 0],
+                ];
+            } else if (type === 'J') {
+                return [
+                    [4, 0, 0],
+                    [4, 4, 4],
+                    [0, 0, 0],
+                ];
+            } else if (type === 'I') {
+                return [
+                    [0, 0, 0, 0],
+                    [5, 5, 5, 5],
+                    [0, 0, 0, 0],
+                    [0, 0, 0, 0],
+                ];
+            } else if (type === 'S') {
+                return [
+                    [0, 6, 6],
+                    [6, 6, 0],
+                    [0, 0, 0],
+                ];
+            } else if (type === 'Z') {
+                return [
+                    [7, 7, 0],
+                    [0, 7, 7],
+                    [0, 0, 0],
+                ];
             }
         }
-    }
-};
 
-// 障礙物陣列
-let obstacles = [];
-
-class Obstacle {
-    constructor() {
-        this.width = 20 + Math.random() * 15;
-        this.height = 30 + Math.random() * 20;
-        this.x = canvas.width;
-        this.y = 213 - this.height;
-    }
-    draw() {
-        ctx.fillStyle = "#535353";
-        ctx.fillRect(this.x, this.y, this.width, this.height);
-        // 加一點仙人掌的細節
-        ctx.clearRect(this.x + 4, this.y + 5, 3, 6);
-        ctx.clearRect(this.x + this.width - 7, this.y + 12, 3, 6);
-    }
-    update() {
-        this.x -= gameSpeed;
-    }
-}
-
-// 鍵盤監聽
-document.addEventListener("keydown", function(e) {
-    if (e.code === "Space" || e.code === "ArrowUp") {
-        if (dino.y >= 170 && !isGameOver) {
-            dino.vy = dino.jumpPower;
-            dino.isJumping = true;
-        }
-        if (isGameOver) {
-            resetGame();
-        }
-    }
-    if (e.code === "ArrowDown" && dino.isJumping) {
-        dino.vy += 6; // 快速下墜
-    }
-});
-
-// 點擊畫面也能跳
-canvas.addEventListener("click", function() {
-    if (dino.y >= 170 && !isGameOver) {
-        dino.vy = dino.jumpPower;
-        dino.isJumping = true;
-    }
-    if (isGameOver) {
-        resetGame();
-    }
-});
-
-function resetGame() {
-    score = 0;
-    gameSpeed = 5;
-    obstacles = [];
-    isGameOver = false;
-    loop();
-}
-
-// 產生障礙物計時器
-let obstacleTimer = 0;
-
-function loop() {
-    if (isGameOver) return;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // 1. 畫地板線條
-    ctx.strokeStyle = "#535353";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(0, 213);
-    ctx.lineTo(canvas.width, 213);
-    ctx.stroke();
-
-    // 2. 更新與繪製小恐龍
-    dino.vy += dino.gravity;
-    dino.y += dino.vy;
-    if (dino.y > 170) {
-        dino.y = 170;
-        dino.vy = 0;
-        dino.isJumping = false;
-    }
-    dino.draw();
-
-    // 3. 管理障礙物
-    obstacleTimer++;
-    if (obstacleTimer > Math.random() * 50 + 70) {
-        obstacles.push(new Obstacle());
-        obstacleTimer = 0;
-    }
-
-    for (let i = obstacles.length - 1; i >= 0; i--) {
-        obstacles[i].update();
-        obstacles[i].draw();
-
-        // 碰撞偵測 (AABB 碰撞箱)
-        if (
-            dino.x < obstacles[i].x + obstacles[i].width - 5 &&
-            dino.x + dino.width - 5 > obstacles[i].x &&
-            dino.y < obstacles[i].y + obstacles[i].height &&
-            dino.y + dino.height > obstacles[i].y
-        ) {
-            isGameOver = true;
+        // 畫出方塊與背景網格
+        function drawMatrix(matrix, offset) {
+            matrix.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (value !== 0) {
+                        context.fillStyle = colors[value];
+                        context.fillRect(x + offset.x, y + offset.y, 1, 1);
+                    }
+                });
+            });
         }
 
-        // 移除跑出畫面的障礙物
-        if (obstacles[i].x + obstacles[i].width < 0) {
-            obstacles.splice(i, 1);
-            score += 10;
-            if (score > highScore) highScore = score;
-            // 隨著分數增加逐漸加速
-            gameSpeed = 5 + Math.floor(score / 100);
+        function draw() {
+            context.fillStyle = '#000';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+
+            drawMatrix(arena, {x: 0, y: 0});
+            drawMatrix(player.matrix, player.pos);
         }
-    }
 
-    // 4. 顯示分數
-    ctx.fillStyle = "#535353";
-    ctx.font = "16px Courier New";
-    let scoreStr = String(score).padStart(5, '0');
-    let highStr = String(highScore).padStart(5, '0');
-    ctx.fillText(`HI ${highStr}  ${scoreStr}`, canvas.width - 180, 30);
+        // 合併方塊到主遊戲盤
+        function merge(arena, player) {
+            player.matrix.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (value !== 0) {
+                        arena[y + player.pos.y][x + player.pos.x] = value;
+                    }
+                });
+            });
+        }
 
-    // 遊戲結束畫面
-    if (isGameOver) {
-        ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        ctx.fillStyle = "#fff";
-        ctx.font = "24px Courier New";
-        ctx.textAlign = "center";
-        ctx.fillText("G A M E   O V E R", canvas.width / 2, canvas.height / 2 - 10);
-        
-        ctx.font = "14px Courier New";
-        ctx.fillText("按一下空白鍵或點擊畫面重新開始", canvas.width / 2, canvas.height / 2 + 25);
-        ctx.textAlign = "left"; // 復原
-        return;
-    }
+        // 消去滿行並計算分數
+        function arenaSweep() {
+            let rowCount = 1;
+            outer: for (let y = arena.length - 1; y > 0; --y) {
+                for (let x = 0; x < arena[y].length; ++x) {
+                    if (arena[y][x] === 0) {
+                        continue outer;
+                    }
+                }
+                const row = arena.splice(y, 1)[0].fill(0);
+                arena.unshift(row);
+                ++y;
 
-    requestAnimationFrame(loop);
-}
+                player.score += rowCount * 10;
+                rowCount *= 2;
+            }
+        }
 
-// 啟動遊戲
-loop();
-</script>
+        // 方塊向下移動
+        function playerDrop() {
+            player.pos.y++;
+            if (collide(arena, player)) {
+                player.pos.y--;
+                merge(arena, player);
+                playerReset();
+                arenaSweep();
+                updateScore();
+            }
+            dropCounter = 0;
+        }
 
+        // 直接落到底部
+        function playerDropInstant() {
+            while (!collide(arena, player)) {
+                player.pos.y++;
+            }
+            player.pos.y--;
+            merge(arena, player);
+            playerReset();
+            arenaSweep();
+            updateScore();
+            dropCounter = 0;
+        }
+
+        // 左右移動
+        function playerMove(dir) {
+            player.pos.x += dir;
+            if (collide(arena, player)) {
+                player.pos.x -= dir;
+            }
+        }
+
+        // 重置/產生新方塊
+        function playerReset() {
+            const pieces = 'TJLOSZI';
+            player.matrix = createPiece(pieces[(pieces.length * Math.random()) | 0]);
+            player.pos.y = 0;
+            player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
+            
+            // 若新方塊一生成就碰撞，代表遊戲結束
+            if (collide(arena, player)) {
+                arena.forEach(row => row.fill(0));
+                player.score = 0;
+                updateScore();
+            }
+        }
+
+        // 旋轉方塊
+        function playerRotate(dir) {
+            const posX = player.pos.x;
+            let offset = 1;
+            rotate(player.matrix, dir);
+            while (collide(arena, player)) {
+                player.pos.x += offset;
+                offset = -(offset + (offset > 0 ? 1 : -1));
+                if (offset > player.matrix[0].length) {
+                    rotate(player.matrix, -dir);
+                    player.pos.x = posX;
+                    return;
+                }
+            }
+        }
+
+        function rotate(matrix, dir) {
+            for (let y = 0; y < matrix.length; ++y) {
+                for (let x = 0; x < y; ++x) {
+                    [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]];
+                }
+            }
+            if (dir > 0) {
+                matrix.forEach(row => row.reverse());
+            } else {
+                matrix.reverse();
+            }
+        }
+
+        let dropCounter = 0;
+        let dropInterval = 1000; // 下落速度 (毫秒)
+        let lastTime = 0;
+
+        function update(time = 0) {
+            const deltaTime = time - lastTime;
+            lastTime = time;
+
+            dropCounter += deltaTime;
+            if (dropCounter > dropInterval) {
+                playerDrop();
+            }
+
+            draw();
+            requestAnimationFrame(update);
+        }
+
+        // 方塊顏色定義
+        const colors = [
+            null,
+            '#FF0D72',
+            '#0DC2FF',
+            '#0DFF72',
+            '#F538FF',
+            '#FF8E0D',
+            '#FFE138',
+            '#3877FF',
+        ];
+
+        const arena = createMatrix(12, 20);
+
+        const player = {
+            pos: {x: 0, y: 0},
+            matrix: null,
+            score: 0,
+        };
+
+        // 鍵盤事件監聽
+        document.addEventListener('keydown', event => {
+            if (event.key === 'ArrowLeft') {
+                playerMove(-1);
+            } else if (event.key === 'ArrowRight') {
+                playerMove(1);
+            } else if (event.key === 'ArrowDown') {
+                playerDrop();
+            } else if (event.key === 'ArrowUp') {
+                playerRotate(1);
+            } else if (event.code === 'Space') {
+                playerDropInstant();
+            }
+        });
+
+        playerReset();
+        updateScore();
+        update();
+    </script>
 </body>
 </html>
